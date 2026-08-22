@@ -1,0 +1,11 @@
+# MẪU MINH HỌA - thay bằng URL thật thuộc chủ đề đồ án của bạn.
+# Dùng Wikipedia ở đây vì được phép crawl công khai (không phải khuyến nghị chủ đề).
+# Nên trộn 2 loại:
+#   - Trang danh mục/liệt kê (để discover_and_enqueue tìm bài mới định kỳ)
+#   - Trang bài viết cụ thể (để có nội dung ngay từ lần chạy đầu)
+
+https://ou.edu.vn/
+https://it.ou.edu.vn/
+https://it.ou.edu.vn/2026/06/01/thong-bao-ve-viec-to-chuc-lai-va-giao-nhiem-vu-cac-chuc-danh-giam-doc-pho-giam-doc-chuong-trinh-thuoc-khoa-cong-nghe-thong-tin/
+https://it.ou.edu.vn/2026/05/01/khoa-cong-nghe-thong-tin-trien-khai-chuong-trinh-dao-tao-tai-nang/
+https://it.ou.edu.vn/nckh/nckh-sinh-vien/

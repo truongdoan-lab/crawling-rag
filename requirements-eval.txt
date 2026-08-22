@@ -1,0 +1,10 @@
+# Cài riêng khi cần đánh giá: pip install -r requirements-eval.txt
+ragas>=0.4
+langchain-google-genai>=2.0
+# QUAN TRỌNG: ép version cũ hơn 0.4 - đã tự kiểm tra thấy bản langchain-community
+# mới nhất (đang trong quá trình "sunset"/ngừng bảo trì) bị thiếu module nội bộ
+# (chat_models.vertexai) mà ragas 0.4.x cần khi import, gây ImportError dù không
+# hề dùng tới Vertex AI. Đây là lỗi tương thích giữa 2 thư viện, không phải do
+# code của bạn - nếu ragas ra bản mới sửa việc này, có thể bỏ ép version.
+langchain-community<0.4
+pandas>=2.0

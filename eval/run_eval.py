@@ -1,0 +1,137 @@
+"""
+Đánh giá Pipeline 2 bằng RAGAS - điểm còn thiếu đã nêu trong review đầu tiên.
+
+Dùng: python eval/run_eval.py eval/golden_dataset.json
+
+Cách hoạt động:
+1. Đọc bộ câu hỏi + đáp án chuẩn (golden_dataset.json, xem golden_dataset.example.json
+   để biết cấu trúc và cách tự viết bộ câu hỏi thật của bạn).
+2. Chạy từng câu hỏi qua đúng ChatPipeline thật (cache -> hybrid search -> rerank ->
+   generate) để lấy answer + context_texts thật (không giả lập).
+3. Dùng RAGAS chấm 4 chỉ số: faithfulness, answer relevancy, context precision,
+   context recall - đúng như đã đề xuất trong review.
+4. Ghi kết quả chi tiết từng câu ra CSV + in bảng tổng hợp ra màn hình.
+
+Judge LLM dùng Gemini (không dùng OpenAI mặc định của RAGAS) qua LangchainLLMWrapper -
+cần cài thêm requirements-eval.txt: pip install -r requirements-eval.txt
+"""
+import argparse
+import json
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from common.config import load_settings
+from pipeline2_chatbot.chat_pipeline import ChatPipeline
+
+
+def load_golden_dataset(path: str) -> list[dict]:
+    with open(path, encoding="utf-8") as f:
+        items = json.load(f)
+    # Bỏ field _comment (chỉ để ghi chú trong file mẫu, không phải dữ liệu thật)
+    return [{"question": it["question"], "reference": it["reference"]} for it in items]
+
+
+def run_pipeline_on_dataset(pipeline: ChatPipeline, items: list[dict]) -> list[dict]:
+    """Chạy từng câu hỏi qua pipeline thật, thu answer + context_texts thật."""
+    results = []
+    for i, item in enumerate(items, start=1):
+        question = item["question"]
+        print(f"[{i}/{len(items)}] Đang hỏi: {question[:70]}...")
+        try:
+            out = pipeline.answer(question)
+        except Exception as exc:  # noqa: BLE001 - lỗi 1 câu không nên làm hỏng cả batch
+            print(f"  !! Lỗi khi trả lời câu này: {exc}")
+            out = {"answer": "", "context_texts": []}
+        results.append(
+            {
+                "question": question,
+                "reference": item["reference"],
+                "answer": out.get("answer", ""),
+                "context_texts": out.get("context_texts", []),
+            }
+        )
+    return results
+
+
+def build_ragas_dataset(results: list[dict]):
+    from ragas import EvaluationDataset, SingleTurnSample
+
+    samples = [
+        SingleTurnSample(
+            user_input=r["question"],
+            response=r["answer"],
+            retrieved_contexts=r["context_texts"] or [""],  # RAGAS cần list không rỗng
+            reference=r["reference"],
+        )
+        for r in results
+    ]
+    return EvaluationDataset(samples=samples)
+
+
+def build_judge():
+    """
+    Judge LLM cho RAGAS = Gemini (không phải OpenAI mặc định), qua LangchainLLMWrapper.
+    Nếu lệnh import hoặc khởi tạo bên dưới báo lỗi, kiểm tra lại cú pháp hiện hành tại
+    https://docs.ragas.io/en/latest/extra/components/choose_evaluator_llm/ - đây là
+    phần dễ đổi API nhất giữa các bản RAGAS.
+    """
+    from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+    from ragas.embeddings import LangchainEmbeddingsWrapper
+    from ragas.llms import LangchainLLMWrapper
+
+    settings = load_settings()
+    judge_llm = ChatGoogleGenerativeAI(
+        model=settings.gemini_model,
+        google_api_key=settings.gemini_api_key,
+        temperature=0,  # cần độ ổn định (deterministic) khi chấm điểm, không cần sáng tạo
+    )
+    judge_embeddings = GoogleGenerativeAIEmbeddings(
+        model="models/gemini-embedding-001", google_api_key=settings.gemini_api_key
+    )
+    return LangchainLLMWrapper(judge_llm), LangchainEmbeddingsWrapper(judge_embeddings)
+
+
+def evaluate_dataset(ragas_dataset):
+    from ragas import evaluate
+    from ragas.metrics import AnswerRelevancy, ContextPrecision, ContextRecall, Faithfulness
+
+    evaluator_llm, evaluator_embeddings = build_judge()
+    metrics = [
+        Faithfulness(llm=evaluator_llm),
+        AnswerRelevancy(llm=evaluator_llm, embeddings=evaluator_embeddings),
+        ContextPrecision(llm=evaluator_llm),
+        ContextRecall(llm=evaluator_llm),
+    ]
+    return evaluate(dataset=ragas_dataset, metrics=metrics)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Đánh giá chatbot bằng RAGAS")
+    parser.add_argument("dataset", help="Đường dẫn tới file golden_dataset.json")
+    parser.add_argument("--output", default="eval/eval_report.csv", help="File CSV ghi kết quả chi tiết")
+    args = parser.parse_args()
+
+    items = load_golden_dataset(args.dataset)
+    print(f"Đã nạp {len(items)} câu hỏi từ {args.dataset}\n")
+
+    settings = load_settings()
+    pipeline = ChatPipeline(settings)
+    results = run_pipeline_on_dataset(pipeline, items)
+
+    print("\nĐang chấm điểm bằng RAGAS (Gemini làm judge)...")
+    ragas_dataset = build_ragas_dataset(results)
+    eval_result = evaluate_dataset(ragas_dataset)
+
+    df = eval_result.to_pandas()
+    df.to_csv(args.output, index=False, encoding="utf-8-sig")
+
+    print("\n=== ĐIỂM TRUNG BÌNH ===")
+    numeric_cols = df.select_dtypes(include="number").columns
+    print(df[numeric_cols].mean().round(3).to_string())
+    print(f"\nChi tiết từng câu đã lưu vào: {args.output}")
+
+
+if __name__ == "__main__":
+    main()
