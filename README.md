@@ -8,17 +8,11 @@ Cài đặt đầy đủ 2 pipeline đã thiết kế và đánh giá:
 
 Tải Docker Desktop về PCs, bật ứng dụng và đảm bảo ứng dụng chạy trong suốt quá trình chạy thử.
 
-''' bash
+```bash
 docker compose up -d
-'''
-'''
 pip install -r requirements.txt
 python -m playwright install chromium --with-deps   # cần cho Crawl4AI
-'''
-
-> **Lưu ý phần cứng:** `FlagEmbedding` (BGE-M3) chạy được trên CPU nhưng khá chậm khi encode
-> nhiều bài viết cùng lúc. Nếu có GPU, đặt `EMBEDDING_DEVICE=cuda` trong `.env` để nhanh hơn
-> đáng kể. Lần chạy đầu sẽ tự tải model BGE-M3 (~2GB) từ Hugging Face.
+```
 
 ## Chạy local
 
