@@ -10,7 +10,7 @@ def main():
     settings = load_settings()
     pipeline = ChatPipeline(settings)
 
-    print("Gõ câu hỏi (Ctrl+C để thoát):")
+    print("Nhập câu hỏi: ")
     while True:
         try:
             question = input("\nBạn: ").strip()

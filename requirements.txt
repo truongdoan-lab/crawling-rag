@@ -1,19 +1,18 @@
-# --- Pipeline 1: Preparation platform ---
-crawl4ai>=0.9,<0.10        # cào dữ liệu (nền Playwright)
-httpx>=0.27                # fetch HTTP nhẹ, thử trước khi fallback sang Crawl4AI
-beautifulsoup4>=4.12       # parse HTML cho nhánh fetch nhẹ
-rq>=1.16                   # Redis Queue - điều phối job crawl
-rq-scheduler>=0.13         # lên lịch quét định kỳ cho RQ (RQ không có sẵn)
-psycopg2-binary>=2.9       # PostgreSQL client
-FlagEmbedding>=1.2         # BGE-M3: sinh dense + sparse embedding cùng lúc
-qdrant-client>=1.10        # vector DB, hỗ trợ native hybrid search (RRF)
+# Preparation pipeline
+crawl4ai>=0.9,<0.10        
+httpx>=0.27                
+beautifulsoup4>=4.12       
+rq>=1.16                   
+rq-scheduler>=0.13         
+psycopg2-binary>=2.9       
+FlagEmbedding>=1.2         
+qdrant-client>=1.10        
 
-# --- Pipeline 2: Q&A chatbot ---
+# Chatbot pipeline
 redis>=5.0
-redisvl>=0.4                # SemanticCache dựng sẵn trên Redis Stack
-cohere>=5.0                 # Rerank API
-google-genai>=1.0           # Gemini SDK hiện hành (thay cho google-generativeai đã deprecated)
+redisvl>=0.4               
+cohere>=5.0                
+google-genai>=1.0
 
-# --- Chung ---
 python-dotenv>=1.0
 pytest>=8.0
