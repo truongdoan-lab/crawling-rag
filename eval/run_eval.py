@@ -83,7 +83,7 @@ def evaluate_dataset(ragas_dataset):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Đánh giá chatbot bằng RAGAS")
+    parser = argparse.ArgumentParser(description="Evaluate chatbot pipeline on a golden dataset using RAGAS.")
     parser.add_argument("dataset", help="Đường dẫn tới file golden_dataset.json")
     parser.add_argument("--output", default="eval/eval_report.csv", help="File CSV ghi kết quả chi tiết")
     args = parser.parse_args()
@@ -95,17 +95,16 @@ def main():
     pipeline = ChatPipeline(settings)
     results = run_pipeline_on_dataset(pipeline, items)
 
-    print("\nĐang chấm điểm bằng RAGAS (Gemini làm judge)...")
     ragas_dataset = build_ragas_dataset(results)
     eval_result = evaluate_dataset(ragas_dataset)
 
     df = eval_result.to_pandas()
     df.to_csv(args.output, index=False, encoding="utf-8-sig")
 
-    print("\n=== ĐIỂM TRUNG BÌNH ===")
+    print("\nAVERAGE SCORES")
     numeric_cols = df.select_dtypes(include="number").columns
     print(df[numeric_cols].mean().round(3).to_string())
-    print(f"\nChi tiết từng câu đã lưu vào: {args.output}")
+    print(f"\nDetail for each question saved to: {args.output}")
 
 
 if __name__ == "__main__":

@@ -9,9 +9,9 @@ def main():
     print("Question: ")
     while True:
         try:
-            question = input("\nBạn: ").strip()
+            question = input("\nYou: ").strip()
         except (KeyboardInterrupt, EOFError):
-            print("\nTạm biệt!")
+            print("\nGoodbye!")
             break
         if not question:
             continue
@@ -21,7 +21,7 @@ def main():
         print(f"\nBot {tag}: {result['answer']}")
         if result["sources"]:
             titles = ", ".join(s["title"] or s["url"] for s in result["sources"])
-            print(f"Nguồn: {titles}")
+            print(f"Sources: {titles}")
 
 
 if __name__ == "__main__":

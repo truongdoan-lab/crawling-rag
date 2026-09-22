@@ -5,7 +5,7 @@ from google.genai import types
 
 SYSTEM_PROMPT = """You are a helpful assistant that answers questions based EXCLUSIVELY on the provided context.
 Strict rules:
-1. Only use information from the context; do not use your own knowledge.
+1. Only use information from the context; Do not use your own knowledge.
 2. If the context is insufficient to answer, state: "I cannot find this information in the provided data."
    Do not guess or fabricate information.
 3. When answering, mention the source article name (if available) at the end of the relevant sentence.

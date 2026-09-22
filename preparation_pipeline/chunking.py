@@ -12,7 +12,6 @@ class Chunk:
 
 
 def _split_by_heading(markdown: str) -> list[tuple[str, str]]:
-    """Trả về list (heading_path, section_text) theo thứ tự xuất hiện."""
     matches = list(HEADING_RE.finditer(markdown))
     if not matches:
         return [("", markdown)]
