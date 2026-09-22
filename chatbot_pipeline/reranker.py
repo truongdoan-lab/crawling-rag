@@ -1,12 +1,3 @@
-"""
-Rerank bằng Cohere Rerank API - lọc lại top candidates từ hybrid search,
-chỉ giữ 1-3 kết quả liên quan nhất để đưa vào prompt.
-
-Cập nhật đã nêu trong review: dùng bản rerank-v3.5 (hoặc rerank-v4 khi cần
-chất lượng cao nhất) thay vì mặc định nghĩ tới bản v3.0 cũ. Nếu muốn tự host
-toàn bộ (giống hướng BGE-M3), có thể thay client này bằng bge-reranker-v2-m3
-mà vẫn giữ nguyên interface .rerank(query, candidates, top_n).
-"""
 import cohere
 
 

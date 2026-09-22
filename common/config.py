@@ -1,6 +1,3 @@
-"""
-Load cấu hình dùng chung cho cả 2 pipeline từ file .env (xem .env.example).
-"""
 import os
 from dataclasses import dataclass
 
@@ -13,21 +10,27 @@ load_dotenv()
 class Settings:
     # Postgres
     postgres_dsn: str
+
     # Redis
     redis_url: str
+
     # Qdrant
     qdrant_url: str
     qdrant_collection: str
-    # Embedding (BGE-M3, tự host)
+
+    # Embedding: BGE-M3
     embedding_model: str
     embedding_device: str
+
     # Cohere Rerank
     cohere_api_key: str
     cohere_rerank_model: str
+
     # Gemini
     gemini_api_key: str
     gemini_model: str
-    # Crawl & cache
+
+    # Crawl and Cache
     crawl_interval_minutes: int
     semantic_cache_threshold: float
     semantic_cache_ttl_seconds: int
@@ -36,9 +39,9 @@ class Settings:
 def load_settings() -> Settings:
     pg_host = os.getenv("POSTGRES_HOST", "localhost")
     pg_port = os.getenv("POSTGRES_PORT", "5432")
-    pg_db = os.getenv("POSTGRES_DB", "rag_pipeline")
-    pg_user = os.getenv("POSTGRES_USER", "rag")
-    pg_password = os.getenv("POSTGRES_PASSWORD", "rag_password")
+    pg_db = os.getenv("POSTGRES_DB", "") # Fill
+    pg_user = os.getenv("POSTGRES_USER", "") # Fill
+    pg_password = os.getenv("POSTGRES_PASSWORD", "") # Fill
     postgres_dsn = (
         f"host={pg_host} port={pg_port} dbname={pg_db} "
         f"user={pg_user} password={pg_password}"

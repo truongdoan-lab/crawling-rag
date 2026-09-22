@@ -3,7 +3,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pipeline1_preparation.chunking import chunk_markdown
+from preparation_pipeline.chunking import chunk_markdown
 
 
 def test_no_heading_falls_back_to_window_split():

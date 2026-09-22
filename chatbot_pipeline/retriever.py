@@ -1,11 +1,5 @@
-"""
-Hybrid search: dùng chung BgeM3Embedder + VectorStore của Pipeline 1.
-Qdrant tự fusion dense + sparse bằng RRF ngay trong Query API - đây chính
-là chỗ hưởng lợi từ việc dùng BGE-M3 cho cả dense lẫn sparse (đã nêu trong
-review): không cần train/duy trì thêm một hệ BM25 riêng cho chatbot.
-"""
-from pipeline1_preparation.embedder import BgeM3Embedder
-from pipeline1_preparation.vector_store import VectorStore
+from preparation_pipeline.embedder import BgeM3Embedder
+from preparation_pipeline.vector_store import VectorStore
 
 
 class Retriever:

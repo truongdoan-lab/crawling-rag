@@ -1,15 +1,12 @@
-"""
-Ghép toàn bộ Pipeline 2 lại: cache -> hybrid search -> rerank -> generate.
-"""
 from common.config import Settings
-from pipeline1_preparation.embedder import BgeM3Embedder
-from pipeline1_preparation.vector_store import VectorStore
-from pipeline2_chatbot.generator import GeminiGenerator
-from pipeline2_chatbot.reranker import CohereReranker
-from pipeline2_chatbot.retriever import Retriever
-from pipeline2_chatbot.semantic_cache import ChatSemanticCache
+from preparation_pipeline.embedder import BgeM3Embedder
+from preparation_pipeline.vector_store import VectorStore
+from chatbot_pipeline.generator import GeminiGenerator
+from chatbot_pipeline.reranker import CohereReranker
+from chatbot_pipeline.retriever import Retriever
+from chatbot_pipeline.semantic_cache import ChatSemanticCache
 
-NO_INFO_ANSWER = "Tôi không tìm thấy thông tin này trong dữ liệu hiện có."
+NO_INFO_ANSWER = "Can not find relevant information in the provided data."
 
 
 class ChatPipeline:
@@ -32,8 +29,6 @@ class ChatPipeline:
         if cached is not None:
             return {"answer": cached, "from_cache": True, "sources": [], "context_texts": []}
 
-        # Guardrail cho câu hỏi ngoài phạm vi (đã nêu trong review): nếu hybrid
-        # search không trả về gì, không đưa câu hỏi cho LLM tự trả lời bừa.
         candidates = self._retriever.retrieve(question, limit=20)
         if not candidates:
             return {"answer": NO_INFO_ANSWER, "from_cache": False, "sources": [], "context_texts": []}
@@ -44,7 +39,6 @@ class ChatPipeline:
         self._cache.store(question, answer)
 
         sources = [{"title": c.get("title"), "url": c.get("url")} for c in top_chunks]
-        # context_texts: nội dung chunk thật đã đưa vào prompt - dùng để đánh giá
-        # bằng RAGAS (retrieved_contexts) và để audit/debug câu trả lời khi cần.
+        
         context_texts = [c["text"] for c in top_chunks]
         return {"answer": answer, "from_cache": False, "sources": sources, "context_texts": context_texts}

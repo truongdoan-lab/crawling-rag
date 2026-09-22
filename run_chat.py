@@ -1,16 +1,12 @@
-"""
-CLI chat đơn giản để test Pipeline 2.
-Dùng: python run_chat.py
-"""
 from common.config import load_settings
-from pipeline2_chatbot.chat_pipeline import ChatPipeline
+from chatbot_pipeline.chat_pipeline import ChatPipeline
 
 
 def main():
     settings = load_settings()
     pipeline = ChatPipeline(settings)
 
-    print("Nhập câu hỏi: ")
+    print("Question: ")
     while True:
         try:
             question = input("\nBạn: ").strip()

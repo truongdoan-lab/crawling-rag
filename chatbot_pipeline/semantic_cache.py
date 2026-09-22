@@ -1,24 +1,10 @@
-"""
-Kiểm tra bộ đệm (semantic cache) bằng RedisVL - so khớp câu hỏi mới với các
-câu hỏi cũ theo độ tương đồng embedding (không phải so y hệt chuỗi).
-
-Dùng lại chính dense embedding của BGE-M3 (không tải thêm model riêng cho
-cache) - truyền thẳng vector qua tham số vector= thay vì dùng vectorizer
-built-in của RedisVL.
-
-2 điểm đã nêu trong review được xử lý ở đây:
-- Ngưỡng similarity (distance_threshold): cần tune bằng thực nghiệm trên
-  tập câu hỏi thật - để mặc định khá chặt (0.1) để giảm rủi ro cache-hit sai.
-- Invalidate khi nội dung nguồn đổi: dùng TTL làm chính sách mặc định đơn
-  giản, cộng thêm invalidate_all() để gọi thủ công khi có đợt cập nhật lớn.
-"""
 from typing import TYPE_CHECKING, Optional
 
 from redisvl.extensions.cache.llm import SemanticCache
 from redisvl.utils.vectorize.base import BaseVectorizer
 
 if TYPE_CHECKING:
-    from pipeline1_preparation.embedder import BgeM3Embedder
+    from preparation_pipeline.embedder import BgeM3Embedder
 
 
 class BgeM3CacheVectorizer(BaseVectorizer):

@@ -1,16 +1,12 @@
-"""
-RQ job: crawl -> kiểm tra content_hash -> chunk -> embed -> lưu Qdrant.
-Đây là nơi ghép toàn bộ Pipeline 1 lại với nhau cho 1 URL.
-"""
 import uuid
 from datetime import datetime, timezone
 
 from common.config import load_settings
-from pipeline1_preparation.chunking import chunk_markdown
-from pipeline1_preparation.crawler import crawl_url_sync
-from pipeline1_preparation.db import ArticleRepository, content_hash
-from pipeline1_preparation.embedder import BgeM3Embedder
-from pipeline1_preparation.vector_store import VectorStore
+from preparation_pipeline.chunking import chunk_markdown
+from preparation_pipeline.crawler import crawl_url_sync
+from preparation_pipeline.db import ArticleRepository, content_hash
+from preparation_pipeline.embedder import BgeM3Embedder
+from preparation_pipeline.vector_store import VectorStore
 
 _settings = load_settings()
 _repo = ArticleRepository(_settings)
@@ -77,7 +73,7 @@ def discover_and_enqueue(seed_urls: list[str]) -> int:
     from redis import Redis
 
     from crawl4ai import AsyncWebCrawler
-    from pipeline1_preparation.queue_utils import enqueue_if_new
+    from preparation_pipeline.queue_utils import enqueue_if_new
 
     redis_conn = Redis.from_url(_settings.redis_url)
 

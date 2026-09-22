@@ -1,8 +1,3 @@
--- Schema quản lý nội dung bài viết (Pipeline 1, bước 3).
--- content_hash + status là 2 điểm bổ sung theo review, giúp:
---   - Phát hiện bài viết bị sửa nội dung dù URL không đổi (content_hash)
---   - Retry đúng bước bị lỗi thay vì crawl lại từ đầu (status)
-
 CREATE TABLE IF NOT EXISTS articles (
     id              BIGSERIAL PRIMARY KEY,
     url             TEXT UNIQUE NOT NULL,
