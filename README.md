@@ -1,17 +1,30 @@
 # Trợ lý ảo RAG tích hợp cào dữ liệu
 
-Cài đặt đầy đủ 2 pipeline đã thiết kế và đánh giá:
-
 ## Cài đặt
 
-1. Điền COHERE_API_KEY, COHERE_RERANK_MODEL GEMINI_MODEL
+1. Clone dự án về máy, tạo môi trường ảo:
 
-Tải Docker Desktop về PCs, bật ứng dụng và đảm bảo ứng dụng chạy trong suốt quá trình chạy thử.
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+
+2. Sao chép tệp môi trường và điền giá trị thật:
+
+```bash
+cp .env.sample .env
+```
+
+Có sử dụng GPU khi có nhu cầu: Cập nhật EMBEDDING_DEVICE=cuda. Điền COHERE_API_KEY, COHERE_RERANK_MODEL GEMINI_MODEL.
+
+3. Khởi động Docker để chạy phần mềm:
+
+Tải Docker Desktop về PCs, bật ứng dụng và đảm bảo ứng dụng chạy trong suốt quá trình chạy local.
 
 ```bash
 docker compose up -d
 pip install -r requirements.txt
-python -m playwright install chromium --with-deps   # cần cho Crawl4AI
+python -m playwright install chromium --with-deps   # Crawl4AI
 ```
 
 ## Chạy local
