@@ -2,7 +2,7 @@
 
 ## Cài đặt
 
-1. Clone dự án về máy, tạo môi trường ảo:
+1. **Clone dự án về máy, tạo môi trường ảo:**
 
 ```bash
 python -m venv venv
