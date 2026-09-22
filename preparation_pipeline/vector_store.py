@@ -1,12 +1,3 @@
-"""
-Lưu trữ vector trong Qdrant.
-
-Điểm đã nêu trong review: HNSW không phải công nghệ cần dựng thêm (đã có
-sẵn bên trong Qdrant cho dense search); cái thực sự cần thêm là BM25/sparse.
-Qdrant hỗ trợ hybrid search ngay trong Query API (dense + sparse trong cùng
-collection, fusion bằng RRF trong 1 lệnh gọi) - không cần dựng thêm cụm
-Elasticsearch riêng.
-"""
 from typing import TYPE_CHECKING
 
 from qdrant_client import QdrantClient
