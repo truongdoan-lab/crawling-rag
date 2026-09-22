@@ -9,15 +9,15 @@ python -m venv venv
 venv\Scripts\activate
 ```
 
-2. Sao chép tệp môi trường và điền giá trị thật:
+2. **Sao chép tệp môi trường và điền giá trị thật:**
 
 ```bash
 cp .env.sample .env
 ```
 
-Có sử dụng GPU khi có nhu cầu: Cập nhật EMBEDDING_DEVICE=cuda. Điền COHERE_API_KEY, COHERE_RERANK_MODEL GEMINI_MODEL.
+Có sử dụng GPU khi có nhu cầu: Cập nhật EMBEDDING_DEVICE=cuda.
 
-3. Khởi động Docker để chạy phần mềm:
+3. **Khởi động Docker để chạy phần mềm:**
 
 Tải Docker Desktop về PCs, bật ứng dụng và đảm bảo ứng dụng chạy trong suốt quá trình chạy local.
 
