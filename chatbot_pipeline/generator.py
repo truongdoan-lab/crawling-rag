@@ -9,13 +9,13 @@ Strict rules:
 2. If the context is insufficient to answer, state: "I cannot find this information in the provided data."
    Do not guess or fabricate information.
 3. When answering, mention the source article name (if available) at the end of the relevant sentence.
-4. Trả lời ngắn gọn, đúng trọng tâm câu hỏi."""
+4. Provide concise and focused answers."""
 
 
 def build_context(chunks: list[dict]) -> str:
     parts = []
     for i, c in enumerate(chunks, start=1):
-        parts.append(f"[Nguồn {i} - {c.get('title') or 'không rõ'}]\n{c['text']}")
+        parts.append(f"[Source {i} - {c.get('title') or 'unknown'}]\n{c['text']}")
     return "\n\n".join(parts)
 
 
@@ -26,7 +26,7 @@ class GeminiGenerator:
 
     def _build_prompt(self, question: str, context_chunks: list[dict]) -> str:
         context = build_context(context_chunks)
-        return f"Ngữ cảnh:\n{context}\n\nCâu hỏi: {question}"
+        return f"Context:\n{context}\n\nQuestion: {question}"
 
     def generate(self, question: str, context_chunks: list[dict]) -> str:
         response = self._client.models.generate_content(
