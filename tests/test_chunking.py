@@ -9,7 +9,7 @@ from preparation_pipeline.chunking import chunk_markdown
 def test_no_heading_falls_back_to_window_split():
     text = "a" * 3000
     chunks = chunk_markdown(text, max_chars=1000, overlap=100)
-    assert len(chunks) == 4  # 1000, 1000, 1000, phần dư có overlap
+    assert len(chunks) == 4
     assert all(c.heading_path == "" for c in chunks)
 
 
@@ -50,4 +50,4 @@ if __name__ == "__main__":
     test_splits_by_heading_and_keeps_path()
     test_long_section_still_gets_window_split_with_overlap()
     test_empty_sections_are_skipped()
-    print("Tất cả test chunking đều PASS.")
+    print("All chunking tests passed.")

@@ -20,7 +20,7 @@ def process_url(url: str, domain: str):
 
     crawled = crawl_url_sync(url)
     if crawled is None:
-        _repo.mark_failed(url, "Không cào được nội dung (cả static lẫn Playwright đều thất bại)")
+        _repo.mark_failed(url, "Not found or failed to crawl")
         return
 
     new_hash = content_hash(crawled.text)
@@ -35,7 +35,7 @@ def process_url(url: str, domain: str):
 
         chunks = chunk_markdown(crawled.text)
         if not chunks:
-            _repo.mark_failed(url, "Không tách được chunk nào từ nội dung")
+            _repo.mark_failed(url, "No chunks found in the content")
             return
 
         embeddings = _embedder.embed([c.text for c in chunks])
@@ -57,7 +57,7 @@ def process_url(url: str, domain: str):
         _store.upsert_chunks(point_ids, embeddings, payloads)
         _repo.mark_embedded(url)
     except Exception as exc:  # noqa: BLE001 - job RQ, cần bắt hết để mark_failed thay vì retry vô hạn
-        _repo.mark_failed(url, f"Lỗi khi chunk/embed/lưu: {exc}")
+        _repo.mark_failed(url, f"Error while chunking/embedding/saving: {exc}")
 
 
 def discover_and_enqueue(seed_urls: list[str]) -> int:

@@ -4,8 +4,8 @@ CREATE TABLE IF NOT EXISTS articles (
     domain          TEXT NOT NULL,
     title           TEXT,
     published_at    TIMESTAMPTZ,
-    content_hash    CHAR(64) NOT NULL DEFAULT '',   -- SHA-256 nội dung đã làm sạch
-    status          TEXT NOT NULL DEFAULT 'pending', -- pending|crawled|embedded|failed
+    content_hash    CHAR(64) NOT NULL DEFAULT '',
+    status          TEXT NOT NULL DEFAULT 'pending',
     error_message   TEXT,
     crawled_at      TIMESTAMPTZ,
     embedded_at     TIMESTAMPTZ,

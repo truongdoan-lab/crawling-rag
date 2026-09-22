@@ -8,7 +8,6 @@ if TYPE_CHECKING:
 
 
 class BgeM3CacheVectorizer(BaseVectorizer):
-    """Describe externally generated BGE-M3 vectors to RedisVL."""
 
     model: str = "BAAI/bge-m3"
     dims: int = 1024

@@ -19,11 +19,11 @@ def run_pipeline_on_dataset(pipeline: ChatPipeline, items: list[dict]) -> list[d
     results = []
     for i, item in enumerate(items, start=1):
         question = item["question"]
-        print(f"[{i}/{len(items)}] Đang hỏi: {question[:70]}...")
+        print(f"[{i}/{len(items)}] Asking: {question[:70]}...")
         try:
             out = pipeline.answer(question)
-        except Exception as exc:  # noqa: BLE001 - lỗi 1 câu không nên làm hỏng cả batch
-            print(f"  !! Lỗi khi trả lời câu này: {exc}")
+        except Exception as exc:
+            print(f"Error occurred while answering this question: {exc}")
             out = {"answer": "", "context_texts": []}
         results.append(
             {
@@ -43,7 +43,7 @@ def build_ragas_dataset(results: list[dict]):
         SingleTurnSample(
             user_input=r["question"],
             response=r["answer"],
-            retrieved_contexts=r["context_texts"] or [""],  # RAGAS cần list không rỗng
+            retrieved_contexts=r["context_texts"] or [""],
             reference=r["reference"],
         )
         for r in results
@@ -60,7 +60,7 @@ def build_judge():
     judge_llm = ChatGoogleGenerativeAI(
         model=settings.gemini_model,
         google_api_key=settings.gemini_api_key,
-        temperature=0,  # cần độ ổn định (deterministic) khi chấm điểm, không cần sáng tạo
+        temperature=0,
     )
     judge_embeddings = GoogleGenerativeAIEmbeddings(
         model="models/gemini-embedding-001", google_api_key=settings.gemini_api_key
@@ -84,12 +84,12 @@ def evaluate_dataset(ragas_dataset):
 
 def main():
     parser = argparse.ArgumentParser(description="Evaluate chatbot pipeline on a golden dataset using RAGAS.")
-    parser.add_argument("dataset", help="Đường dẫn tới file golden_dataset.json")
-    parser.add_argument("--output", default="eval/eval_report.csv", help="File CSV ghi kết quả chi tiết")
+    parser.add_argument("dataset", help="Path to the golden_dataset.json file")
+    parser.add_argument("--output", default="eval/eval_report.csv", help="CSV file to save detailed results")
     args = parser.parse_args()
 
     items = load_golden_dataset(args.dataset)
-    print(f"Đã nạp {len(items)} câu hỏi từ {args.dataset}\n")
+    print(f"Loaded {len(items)} questions from {args.dataset}\n")
 
     settings = load_settings()
     pipeline = ChatPipeline(settings)

@@ -9,7 +9,6 @@ from common.config import Settings
 
 
 def content_hash(text: str) -> str:
-    """SHA-256 của nội dung đã làm sạch, dùng để phát hiện bài viết bị sửa nội dung."""
     return hashlib.sha256(text.strip().encode("utf-8")).hexdigest()
 
 
