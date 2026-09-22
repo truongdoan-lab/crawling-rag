@@ -46,5 +46,4 @@ class ChatSemanticCache:
         self._cache.store(prompt=question, response=answer, vector=vector)
 
     def invalidate_all(self):
-        """Gọi khi nội dung nguồn thay đổi nhiều, tránh trả lời dựa trên dữ liệu cũ."""
         self._cache.clear()

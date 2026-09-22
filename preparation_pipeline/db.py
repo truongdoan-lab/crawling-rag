@@ -1,14 +1,3 @@
-"""
-Quản lý nội dung bài viết trong PostgreSQL.
-
-Bổ sung 2 điểm còn thiếu đã nêu trong review:
-- content_hash: chỉ dựa vào "URL đã tồn tại" là không đủ để biết bài có MỚI
-  hay không - nếu một bài cũ bị chỉnh sửa nội dung, URL vẫn y nguyên. Hash
-  SHA-256 của nội dung đã làm sạch giúp phát hiện thay đổi này -> trigger
-  re-embed thay vì skip.
-- status (pending/crawled/embedded/failed): để retry đúng bước bị lỗi thay
-  vì phải crawl lại từ đầu.
-"""
 import hashlib
 from contextlib import contextmanager
 from datetime import datetime, timezone
@@ -41,7 +30,6 @@ class ArticleRepository:
             conn.close()
 
     def upsert_pending(self, url: str, domain: str) -> int:
-        """Thêm URL mới vào bảng với status=pending nếu chưa tồn tại. Trả về id."""
         with self._conn() as conn, conn.cursor() as cur:
             cur.execute(
                 """
@@ -59,10 +47,6 @@ class ArticleRepository:
             return cur.fetchone()[0]
 
     def needs_processing(self, url: str, new_hash: str) -> bool:
-        """
-        True nếu URL chưa từng embed thành công, HOẶC content_hash đã đổi
-        (bài viết bị chỉnh sửa kể từ lần crawl trước) -> cần re-embed.
-        """
         with self._conn() as conn, conn.cursor() as cur:
             cur.execute(
                 "SELECT content_hash, status FROM articles WHERE url = %s", (url,)

@@ -1,27 +1,14 @@
-"""
-Sinh câu trả lời cuối cùng bằng Gemini.
-
-Điểm còn thiếu đã nêu trong review, xử lý ở đây:
-- Prompt ép model chỉ dùng context được cung cấp, và từ chối trả lời khi
-  thiếu thông tin thay vì tự bịa (chống hallucination) - gần như bắt buộc
-  với một RAG chatbot nghiêm túc.
-- generate_stream(): streaming response để cải thiện trải nghiệm chat.
-
-Dùng google-genai (SDK hiện hành) thay cho google-generativeai đã deprecated.
-Tên model cần chốt lại theo bản hiện hành khi triển khai thực tế (dòng
-Flash-Lite của Gemini 3 hiện đã lên tới bản 3.5, xem phần đánh giá).
-"""
 from typing import Iterator
 
 from google import genai
 from google.genai import types
 
-SYSTEM_PROMPT = """Bạn là trợ lý trả lời câu hỏi dựa HOÀN TOÀN vào các đoạn ngữ cảnh được cung cấp.
-Quy tắc bắt buộc:
-1. Chỉ dùng thông tin có trong ngữ cảnh; không dùng kiến thức nền của bạn.
-2. Nếu ngữ cảnh không đủ để trả lời, nói rõ: "Tôi không tìm thấy thông tin này trong dữ liệu hiện có."
-   Không suy đoán hay bịa thông tin.
-3. Khi trả lời, nêu tên bài viết nguồn (nếu có) ở cuối câu liên quan.
+SYSTEM_PROMPT = """You are a helpful assistant that answers questions based EXCLUSIVELY on the provided context.
+Strict rules:
+1. Only use information from the context; do not use your own knowledge.
+2. If the context is insufficient to answer, state: "I cannot find this information in the provided data."
+   Do not guess or fabricate information.
+3. When answering, mention the source article name (if available) at the end of the relevant sentence.
 4. Trả lời ngắn gọn, đúng trọng tâm câu hỏi."""
 
 

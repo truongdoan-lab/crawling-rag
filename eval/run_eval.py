@@ -1,20 +1,3 @@
-"""
-Đánh giá Pipeline 2 bằng RAGAS - điểm còn thiếu đã nêu trong review đầu tiên.
-
-Dùng: python eval/run_eval.py eval/golden_dataset.json
-
-Cách hoạt động:
-1. Đọc bộ câu hỏi + đáp án chuẩn (golden_dataset.json, xem golden_dataset.example.json
-   để biết cấu trúc và cách tự viết bộ câu hỏi thật của bạn).
-2. Chạy từng câu hỏi qua đúng ChatPipeline thật (cache -> hybrid search -> rerank ->
-   generate) để lấy answer + context_texts thật (không giả lập).
-3. Dùng RAGAS chấm 4 chỉ số: faithfulness, answer relevancy, context precision,
-   context recall - đúng như đã đề xuất trong review.
-4. Ghi kết quả chi tiết từng câu ra CSV + in bảng tổng hợp ra màn hình.
-
-Judge LLM dùng Gemini (không dùng OpenAI mặc định của RAGAS) qua LangchainLLMWrapper -
-cần cài thêm requirements-eval.txt: pip install -r requirements-eval.txt
-"""
 import argparse
 import json
 import sys
@@ -23,18 +6,16 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from common.config import load_settings
-from pipeline2_chatbot.chat_pipeline import ChatPipeline
+from chatbot_pipeline.chat_pipeline import ChatPipeline
 
 
 def load_golden_dataset(path: str) -> list[dict]:
     with open(path, encoding="utf-8") as f:
         items = json.load(f)
-    # Bỏ field _comment (chỉ để ghi chú trong file mẫu, không phải dữ liệu thật)
     return [{"question": it["question"], "reference": it["reference"]} for it in items]
 
 
 def run_pipeline_on_dataset(pipeline: ChatPipeline, items: list[dict]) -> list[dict]:
-    """Chạy từng câu hỏi qua pipeline thật, thu answer + context_texts thật."""
     results = []
     for i, item in enumerate(items, start=1):
         question = item["question"]
@@ -71,12 +52,6 @@ def build_ragas_dataset(results: list[dict]):
 
 
 def build_judge():
-    """
-    Judge LLM cho RAGAS = Gemini (không phải OpenAI mặc định), qua LangchainLLMWrapper.
-    Nếu lệnh import hoặc khởi tạo bên dưới báo lỗi, kiểm tra lại cú pháp hiện hành tại
-    https://docs.ragas.io/en/latest/extra/components/choose_evaluator_llm/ - đây là
-    phần dễ đổi API nhất giữa các bản RAGAS.
-    """
     from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
     from ragas.embeddings import LangchainEmbeddingsWrapper
     from ragas.llms import LangchainLLMWrapper

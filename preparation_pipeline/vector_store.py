@@ -16,14 +16,12 @@ from qdrant_client.models import (
 )
 
 if TYPE_CHECKING:
-    # Chỉ dùng cho type hint, không import thật lúc chạy -> vector_store.py
-    # (mối quan tâm về Qdrant) không bị buộc phải cài FlagEmbedding/torch
-    # (mối quan tâm về embedding) chỉ để import module này.
-    from pipeline1_preparation.embedder import EmbeddingResult
+    
+    from preparation_pipeline.embedder import EmbeddingResult
 
 DENSE_VECTOR_NAME = "dense"
 SPARSE_VECTOR_NAME = "sparse"
-DENSE_DIM = 1024  # BGE-M3 xuất dense vector 1024 chiều
+DENSE_DIM = 1024
 
 
 class VectorStore:
@@ -59,8 +57,6 @@ class VectorStore:
         self._client.upsert(collection_name=self._collection, points=points)
 
     def delete_by_url(self, url: str):
-        """Xóa toàn bộ chunk cũ của 1 URL trước khi ghi chunk mới - dùng khi
-        content_hash đổi (bài viết bị sửa nội dung), tránh để lại vector cũ."""
         self._client.delete(
             collection_name=self._collection,
             points_selector=Filter(must=[FieldCondition(key="url", match=MatchValue(value=url))]),

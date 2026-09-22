@@ -1,13 +1,3 @@
-"""
-Cào nội dung webpage.
-
-Điểm đã nêu trong review: Crawl4AI mặc định luôn bật headless browser
-(Playwright), khá tốn tài nguyên cho các trang không cần render JS (đa số
-site tin tức/blog). Ở đây áp dụng chiến lược 2 tầng:
-  1. fetch_static(): thử fetch HTTP thường trước (nhẹ, nhanh, rẻ)
-  2. fetch_with_browser(): chỉ fallback sang Crawl4AI/Playwright khi fetch
-     nhẹ không đủ (nội dung quá ngắn -> khả năng cao là trang JS-render)
-"""
 import asyncio
 from dataclasses import dataclass
 from typing import Optional
@@ -16,14 +6,14 @@ import httpx
 from bs4 import BeautifulSoup
 from crawl4ai import AsyncWebCrawler, BrowserConfig, CacheMode, CrawlerRunConfig
 
-MIN_CONTENT_LENGTH = 300  # ít hơn ngần này ký tự -> coi là chưa đủ, fallback Playwright
+MIN_CONTENT_LENGTH = 300
 USER_AGENT = "Mozilla/5.0 (compatible; CourseProjectBot/1.0; +educational-use)"
 
 
 @dataclass
 class CrawledPage:
     title: str
-    text: str  # markdown (nhánh browser) hoặc plain text đã làm sạch (nhánh static)
+    text: str 
 
 
 async def fetch_static(url: str) -> Optional[CrawledPage]:
@@ -37,7 +27,7 @@ async def fetch_static(url: str) -> Optional[CrawledPage]:
             tag.decompose()
         text = soup.get_text(separator="\n", strip=True)
         if len(text) < MIN_CONTENT_LENGTH:
-            return None  # có thể là trang JS-render -> để crawl_url() fallback
+            return None
         return CrawledPage(title=title, text=text)
     except Exception:
         return None
@@ -60,7 +50,6 @@ async def fetch_with_browser(url: str) -> Optional[CrawledPage]:
 
 
 async def crawl_url(url: str) -> Optional[CrawledPage]:
-    """Thử fetch nhẹ trước; chỉ bật Playwright khi cần."""
     page = await fetch_static(url)
     if page:
         return page

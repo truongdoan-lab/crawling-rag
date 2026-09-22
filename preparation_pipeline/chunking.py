@@ -1,12 +1,3 @@
-"""
-Chunking văn bản - điểm còn thiếu hoàn toàn trong thiết kế gốc đã nêu trong
-review, và là một trong những quyết định ảnh hưởng nhiều nhất đến chất
-lượng RAG.
-
-Vì Crawl4AI xuất ra markdown có giữ cấu trúc heading, ở đây chunk theo
-heading/section trước (giữ ngữ cảnh trọn vẹn theo từng mục), sau đó mới cắt
-tiếp bằng cửa sổ trượt có overlap cho section nào vẫn còn dài hơn max_chars.
-"""
 import re
 from dataclasses import dataclass
 
@@ -16,7 +7,7 @@ HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$", re.MULTILINE)
 @dataclass
 class Chunk:
     text: str
-    heading_path: str  # vd "Giới thiệu > Lịch sử"
+    heading_path: str
     chunk_index: int
 
 
@@ -27,7 +18,7 @@ def _split_by_heading(markdown: str) -> list[tuple[str, str]]:
         return [("", markdown)]
 
     sections: list[tuple[str, str]] = []
-    heading_stack: list[tuple[int, str]] = []  # (level, text)
+    heading_stack: list[tuple[int, str]] = []
 
     for i, m in enumerate(matches):
         level = len(m.group(1))
@@ -65,10 +56,6 @@ def _window_split(text: str, max_chars: int, overlap: int) -> list[str]:
 
 
 def chunk_markdown(markdown: str, max_chars: int = 1200, overlap: int = 150) -> list[Chunk]:
-    """
-    Chunk theo heading trước, sau đó cắt tiếp bằng cửa sổ trượt có overlap
-    cho section nào vẫn dài hơn max_chars.
-    """
     sections = _split_by_heading(markdown)
     chunks: list[Chunk] = []
     idx = 0

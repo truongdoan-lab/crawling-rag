@@ -25,15 +25,12 @@ def process_url(url: str, domain: str):
 
     new_hash = content_hash(crawled.text)
 
-    # Chỉ dựa vào "URL đã tồn tại" là chưa đủ để biết bài "mới" - so hash để
-    # phát hiện cả trường hợp bài cũ bị chỉnh sửa nội dung (điểm đã nêu trong review)
     if not _repo.needs_processing(url, new_hash):
-        return  # nội dung không đổi kể từ lần embed trước -> bỏ qua, tiết kiệm compute
+        return
 
     _repo.mark_crawled(url, crawled.title, None, new_hash)
 
     try:
-        # Nội dung đã đổi (hoặc là bài mới) -> xóa chunk/vector cũ trước khi ghi mới
         _store.delete_by_url(url)
 
         chunks = chunk_markdown(crawled.text)
@@ -64,10 +61,6 @@ def process_url(url: str, domain: str):
 
 
 def discover_and_enqueue(seed_urls: list[str]) -> int:
-    """
-    Job chạy định kỳ (qua rq-scheduler): mở lại các trang seed (trang chủ,
-    trang danh mục), tìm link bài viết mới, enqueue process_url cho link mới.
-    """
     import asyncio
 
     from redis import Redis
